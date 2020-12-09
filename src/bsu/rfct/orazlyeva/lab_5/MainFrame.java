@@ -45,3 +45,45 @@ public class MainFrame extends JFrame {
                 MainFrame.this.openGraphics(MainFrame.this.fileChooser.getSelectedFile());
             }
         };
+        fileMenu.add(openGraphicsAction);
+        Action resetGraphicsAction = new AbstractAction("Отменить все изменения") {
+            public void actionPerformed(ActionEvent event) {
+                MainFrame.this.display.reset();
+            }
+        };
+        this.resetGraphicsMenuItem = fileMenu.add(resetGraphicsAction);
+        this.resetGraphicsMenuItem.setEnabled(false);
+        this.getContentPane().add(this.display, "Center");
+    }
+
+    protected void openGraphics(File selectedFile) {
+        try {
+            DataInputStream in = new DataInputStream(new FileInputStream(selectedFile));
+            ArrayList graphicsData = new ArrayList(50);
+
+            while(in.available() > 0) {
+                Double x = in.readDouble();
+                Double y = in.readDouble();
+                graphicsData.add(new Double[]{x, y});
+            }
+
+            if (graphicsData.size() > 0) {
+                this.fileLoaded = true;
+                this.resetGraphicsMenuItem.setEnabled(true);
+                this.display.displayGraphics(graphicsData);
+            }
+
+        } catch (FileNotFoundException var6) {
+            JOptionPane.showMessageDialog(this, "Указанный файл не найден", "Ошибка загрузки данных", 2);
+        } catch (IOException var7) {
+            JOptionPane.showMessageDialog(this, "Ошибка чтения координат точек из файла", "Ошибка загрузки данных", 2);
+        }
+    }
+
+    public static void main(String[] args) {
+        MainFrame frame = new MainFrame();
+        frame.setDefaultCloseOperation(3);
+        frame.setVisible(true);
+    }
+}
+
